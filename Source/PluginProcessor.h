@@ -42,6 +42,9 @@ public:
     float getParameter (int index);
     void setParameter (int index, float newValue);
 
+		void	setSampleFile(File* newSampleFile);
+		File	getSampleFile() { return sampleFile; }
+
     const String getParameterName (int index);
     const String getParameterText (int index);
 
@@ -65,6 +68,9 @@ public:
     void setStateInformation (const void* data, int sizeInBytes);
 
 		MidiKeyboardState	keyboardState;
+
+protected:
+		File	sampleFile;
 
 private:
     //==============================================================================

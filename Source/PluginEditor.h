@@ -33,6 +33,10 @@ protected:
 		TextButton	button;
 		Label 	pathLabel;
 		MidiKeyboardComponent	midiKeyboard;
+
+		JuceBoxAudioProcessor* getProcessor() const {
+			return static_cast<JuceBoxAudioProcessor*> (getAudioProcessor());
+			}
 };
 
 

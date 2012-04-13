@@ -15,6 +15,10 @@
 //==============================================================================
 JuceBoxAudioProcessor::JuceBoxAudioProcessor()
 {
+	Logger::setCurrentLogger(
+		FileLogger::createDefaultAppLogger(
+			"JuceBox", "JuceBox.log", "JuceBox started"),
+		true);
 }
 
 JuceBoxAudioProcessor::~JuceBoxAudioProcessor()
@@ -40,6 +44,13 @@ float JuceBoxAudioProcessor::getParameter (int index)
 void JuceBoxAudioProcessor::setParameter (int index, float newValue)
 {
 }
+
+
+void JuceBoxAudioProcessor::setSampleFile(File* newSampleFile)
+{
+	sampleFile = *newSampleFile;
+}
+
 
 const String JuceBoxAudioProcessor::getParameterName (int index)
 {
@@ -160,16 +171,25 @@ AudioProcessorEditor* JuceBoxAudioProcessor::createEditor()
 //==============================================================================
 void JuceBoxAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
+	XmlElement xml("JuceBox");
+	xml.setAttribute("sampleFile", sampleFile.getFullPathName());
+	copyXmlToBinary(xml, destData);
 }
+
 
 void JuceBoxAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
+	Logger::writeToLog("- setStateInformation().");
+	ScopedPointer<XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
+	if (xmlState) {
+		if (xmlState->hasTagName("JuceBox")) {
+			String sampleFilePath = xmlState->getStringAttribute("sampleFile");
+			Logger::writeToLog("- sampleFile = " + sampleFilePath);
+			sampleFile = sampleFilePath;
+			}
+		}
 }
+
 
 //==============================================================================
 // This creates new instances of the plugin..

@@ -27,6 +27,8 @@ JuceBoxAudioProcessorEditor::JuceBoxAudioProcessorEditor (JuceBoxAudioProcessor*
 
 	addAndMakeVisible(&pathLabel);
 	pathLabel.setFont(Font(14.0));
+	File sampleFile = ownerFilter->getSampleFile();
+	pathLabel.setText(sampleFile.getFullPathName(), false);
 
 	addAndMakeVisible(&midiKeyboard);
 }
@@ -70,6 +72,7 @@ void JuceBoxAudioProcessorEditor::buttonClicked(Button* clickedButton)
 			"*.wav;*.WAV;*.ogg;*.AIF;*.aiff");
 		if (chooser.browseForFileToOpen()) {
 			File sampleFile(chooser.getResult());
+			getProcessor()->setSampleFile(&sampleFile);
 			pathLabel.setText(sampleFile.getFullPathName(), false);
 			}
 		}
