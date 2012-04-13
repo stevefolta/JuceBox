@@ -42,6 +42,7 @@
     <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="1"/>
     <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="1"/>
     <MODULE id="juce_audio_plugin_client" showAllCode="1" useLocalCopy="1"/>
+    <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="1"/>
   </MODULES>
   <JUCEOPTIONS JUCE_QUICKTIME="disabled"/>
 </JUCERPROJECT>

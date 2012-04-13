@@ -18,15 +18,21 @@
 //==============================================================================
 /**
 */
-class JuceBoxAudioProcessorEditor  : public AudioProcessorEditor
+class JuceBoxAudioProcessorEditor :
+	public AudioProcessorEditor, public ButtonListener
 {
 public:
     JuceBoxAudioProcessorEditor (JuceBoxAudioProcessor* ownerFilter);
     ~JuceBoxAudioProcessorEditor();
 
-    //==============================================================================
-    // This is just a standard Juce paint method...
-    void paint (Graphics& g);
+    void	paint(Graphics& g);
+		void	resized();
+		void	buttonClicked(Button* button);
+
+protected:
+		TextButton	button;
+		Label 	pathLabel;
+		MidiKeyboardComponent	midiKeyboard;
 };
 
 
