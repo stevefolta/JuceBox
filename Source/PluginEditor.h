@@ -19,7 +19,7 @@
 /**
 */
 class JuceBoxAudioProcessorEditor :
-	public AudioProcessorEditor, public ButtonListener
+	public AudioProcessorEditor, public ButtonListener, public Timer
 {
 public:
     JuceBoxAudioProcessorEditor (JuceBoxAudioProcessor* ownerFilter);
@@ -28,10 +28,12 @@ public:
     void	paint(Graphics& g);
 		void	resized();
 		void	buttonClicked(Button* button);
+		void	timerCallback();
 
 protected:
 		TextButton	button;
 		Label 	pathLabel;
+		Label 	infoLabel;
 		MidiKeyboardComponent	midiKeyboard;
 
 		JuceBoxAudioProcessor* getProcessor() const {

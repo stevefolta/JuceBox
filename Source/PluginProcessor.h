@@ -71,6 +71,10 @@ public:
 
 		String	formatWildcards();
 
+		String	infoString();
+		SamplerSound*	getSound();
+		uint64 blocksStarted, blocksFinished;
+
 protected:
 		File sampleFile;
 		Synthesiser synth;

@@ -30,7 +30,12 @@ JuceBoxAudioProcessorEditor::JuceBoxAudioProcessorEditor (JuceBoxAudioProcessor*
 	File sampleFile = ownerFilter->getSampleFile();
 	pathLabel.setText(sampleFile.getFullPathName(), false);
 
+	addAndMakeVisible(&infoLabel);
+	infoLabel.setFont(Font(14.0));
+
 	addAndMakeVisible(&midiKeyboard);
+
+	startTimer(50);
 }
 
 
@@ -51,15 +56,19 @@ void JuceBoxAudioProcessorEditor::resized()
 		hMargin = 10,
 		vMargin = 4,
 		buttonHeight = 25,
-		pathHeight = 25,
+		labelHeight = 25,
 		keyboardHeight = 70,
 		};
 	button.setBounds(hMargin, vMargin, 150, buttonHeight);
+	int marginedWidth = getWidth() - 2 * hMargin;
 	pathLabel.setBounds(
-		hMargin, vMargin + buttonHeight, getWidth() - 2 * hMargin, pathHeight);
+		hMargin, vMargin + buttonHeight, marginedWidth, labelHeight);
+	infoLabel.setBounds(
+		hMargin, vMargin + buttonHeight + labelHeight,
+		marginedWidth, labelHeight);
 	midiKeyboard.setBounds(
 		hMargin, getHeight() - keyboardHeight - vMargin,
-		getWidth() - 2 * hMargin, keyboardHeight);
+		marginedWidth, keyboardHeight);
 }
 
 
@@ -77,6 +86,15 @@ void JuceBoxAudioProcessorEditor::buttonClicked(Button* clickedButton)
 			pathLabel.setText(sampleFile.getFullPathName(), false);
 			}
 		}
+}
+
+
+void JuceBoxAudioProcessorEditor::timerCallback()
+{
+	JuceBoxAudioProcessor* processor = getProcessor();
+	if (processor == NULL)
+		return;
+	infoLabel.setText(processor->infoString(), false);
 }
 
 

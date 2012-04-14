@@ -19,6 +19,7 @@ JuceBoxAudioProcessor::JuceBoxAudioProcessor()
 		FileLogger::createDefaultAppLogger(
 			"JuceBox", "JuceBox.log", "JuceBox started"),
 		true);
+	blocksStarted = blocksFinished = 0;
 
 	// Accept *all* the formats Juce supports.
 	// Why doesn't AudioFormatManager have a function for this?
@@ -153,7 +154,6 @@ void JuceBoxAudioProcessor::changeProgramName (int index, const String& newName)
 //==============================================================================
 void JuceBoxAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-	Logger::writeToLog("- prepareToPlay(" + String(sampleRate) + ", " + String(samplesPerBlock) + ").");
 	synth.setCurrentPlaybackSampleRate(sampleRate);
 	keyboardState.reset();
 }
@@ -168,11 +168,15 @@ void JuceBoxAudioProcessor::releaseResources()
 
 void JuceBoxAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
-	int numSamples = buffer.getNumChannels();
+	blocksStarted += 1;
+
+	int numSamples = buffer.getNumSamples();
 
 	keyboardState.processNextMidiBuffer(midiMessages, 0, numSamples, true);
 
 	synth.renderNextBlock(buffer, midiMessages, 0, numSamples);
+
+	blocksFinished += 1;
 }
 
 
@@ -246,6 +250,35 @@ void JuceBoxAudioProcessor::loadSound()
 String JuceBoxAudioProcessor::formatWildcards()
 {
 	return formatManager.getWildcardForAllFormats();
+}
+
+
+String JuceBoxAudioProcessor::infoString()
+{
+	SamplerSound* sound = getSound();
+	if (sound == NULL)
+		return "";
+	return
+		String(sound->lastNote) + (sound->lastNoteOn ? " on" : " off") +
+		" proc: " +
+		String(blocksStarted) + "/" + String(blocksFinished) +
+		" midi: " + String(synth.midiEvents) +
+		" notes: " +
+		String(synth.notesOn) + "/" + String(synth.notesOff) +
+		" synth: " +
+		String(synth.blocksStarted) + "/" + String(synth.blocksFinished) +
+		" notes: " +
+		String(sound->notesApplied) + "/" + String(sound->notesAccepted) +
+		" snd: " +
+		String((int64) sound->blocksStarted) + "/" +
+		String((int64) sound->blocksFinished);
+}
+
+
+SamplerSound* JuceBoxAudioProcessor::getSound()
+{
+	SynthesiserSound* sound = synth.getSound(0);
+	return dynamic_cast<SamplerSound*>(sound);
 }
 
 

@@ -86,6 +86,11 @@ public:
     bool appliesToNote (const int midiNoteNumber);
     bool appliesToChannel (const int midiChannel);
 
+		long int blocksStarted, blocksFinished;
+		int lastNote;
+		bool lastNoteOn;
+		int notesApplied, notesAccepted;
+
 
 private:
     //==============================================================================

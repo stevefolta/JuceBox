@@ -440,6 +440,10 @@ public:
                           int startSample,
                           int numSamples);
 
+		uint64 blocksStarted, blocksFinished;
+		uint notesOn, notesOff;
+		uint midiEvents;
+
 protected:
     //==============================================================================
     /** This is used to control access to the rendering callback and the note trigger methods. */
