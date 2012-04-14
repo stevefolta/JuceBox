@@ -64,6 +64,7 @@ SamplerSound::~SamplerSound()
 //==============================================================================
 bool SamplerSound::appliesToNote (const int midiNoteNumber)
 {
+	Logger::writeToLog("- appliesToNote " + String(midiNoteNumber) + " = " + String(midiNotes[midiNoteNumber]));
     return midiNotes [midiNoteNumber];
 }
 

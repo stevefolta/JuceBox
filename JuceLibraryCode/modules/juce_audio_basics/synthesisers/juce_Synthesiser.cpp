@@ -216,6 +216,7 @@ void Synthesiser::noteOn (const int midiChannel,
                           const int midiNoteNumber,
                           const float velocity)
 {
+Logger::writeToLog("- noteOn(" + String(midiChannel) + ", " + String(midiNoteNumber) + ", " + String(velocity) + ").");
     const ScopedLock sl (lock);
 
     for (int i = sounds.size(); --i >= 0;)
