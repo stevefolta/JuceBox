@@ -240,7 +240,7 @@ void JuceBoxAudioProcessor::loadSound()
 			*reader,
 			notes,
 			72 /* C5 == middle C above A-440 */,
-			0.0, 0.0,
+			0.0, 0.01,
 			20.0 /* max time, hopefully 20s is enough for any sound */);
 	synth.addSound(sound);
 	delete reader;
