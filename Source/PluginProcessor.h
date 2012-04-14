@@ -69,8 +69,14 @@ public:
 
 		MidiKeyboardState	keyboardState;
 
+		String	formatWildcards();
+
 protected:
-		File	sampleFile;
+		File sampleFile;
+		Synthesiser synth;
+		AudioFormatManager formatManager;
+
+		void	loadSound();
 
 private:
     //==============================================================================

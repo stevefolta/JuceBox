@@ -66,13 +66,14 @@ void JuceBoxAudioProcessorEditor::resized()
 void JuceBoxAudioProcessorEditor::buttonClicked(Button* clickedButton)
 {
 	if (clickedButton == &button) {
+		JuceBoxAudioProcessor* processor = getProcessor();
 		FileChooser chooser(
 			"Select a sample file...",
 			File::nonexistent,
-			"*.wav;*.WAV;*.ogg;*.AIF;*.aiff");
+			processor->formatWildcards());
 		if (chooser.browseForFileToOpen()) {
 			File sampleFile(chooser.getResult());
-			getProcessor()->setSampleFile(&sampleFile);
+			processor->setSampleFile(&sampleFile);
 			pathLabel.setText(sampleFile.getFullPathName(), false);
 			}
 		}

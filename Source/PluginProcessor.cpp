@@ -19,6 +19,32 @@ JuceBoxAudioProcessor::JuceBoxAudioProcessor()
 		FileLogger::createDefaultAppLogger(
 			"JuceBox", "JuceBox.log", "JuceBox started"),
 		true);
+
+	// Accept *all* the formats Juce supports.
+	// Why doesn't AudioFormatManager have a function for this?
+	formatManager.registerFormat(new AiffAudioFormat(), false);
+	formatManager.registerFormat(new WavAudioFormat(), false);
+#if JUCE_USE_OGGVORBIS
+	formatManager.registerFormat(new OggVorbisAudioFormat(), false);
+#endif
+#if JUCE_USE_FLAC
+	formatManager.registerFormat(new FlacAudioFormat(), false);
+#endif
+#if JUCE_USE_MP3AUDIOFORMAT
+	formatManager.registerFormat(new MP3AudioFormat(), false);
+#endif
+#if JUCE_MAC || JUCE_IOS
+	formatManager.registerFormat(new CoreAudioFormat(), false);
+#endif
+#if JUCE_QUICKTIME
+	formatManager.registerFormat(new QuickTimeAudioFormat(), false);
+#endif
+#if JUCE_WINDOWS
+	formatManager.registerFormat(new WindowsMediaAudioFormat(), false);
+#endif
+
+	for (int i = 0; i < 16; ++i)
+		synth.addVoice(new SamplerVoice());
 }
 
 JuceBoxAudioProcessor::~JuceBoxAudioProcessor()
@@ -49,6 +75,7 @@ void JuceBoxAudioProcessor::setParameter (int index, float newValue)
 void JuceBoxAudioProcessor::setSampleFile(File* newSampleFile)
 {
 	sampleFile = *newSampleFile;
+	loadSound();
 }
 
 
@@ -126,6 +153,8 @@ void JuceBoxAudioProcessor::changeProgramName (int index, const String& newName)
 //==============================================================================
 void JuceBoxAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
+	Logger::writeToLog("- prepareToPlay(" + String(sampleRate) + ", " + String(samplesPerBlock) + ").");
+	synth.setCurrentPlaybackSampleRate(sampleRate);
 	keyboardState.reset();
 }
 
@@ -136,28 +165,17 @@ void JuceBoxAudioProcessor::releaseResources()
 	keyboardState.reset();
 }
 
+
 void JuceBoxAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
 	int numSamples = buffer.getNumChannels();
 
 	keyboardState.processNextMidiBuffer(midiMessages, 0, numSamples, true);
 
-	// This is the place where you'd normally do the guts of your plugin's
-	// audio processing...
-	for (int channel = 0; channel < getNumInputChannels(); ++channel) {
-		float* channelData = buffer.getSampleData (channel);
-
-		// ..do something to the data...
-		}
-
-	// In case we have more outputs than inputs, we'll clear any output
-	// channels that didn't contain input data, (because these aren't
-	// guaranteed to be empty - they may contain garbage).
-	for (int i = getNumInputChannels(); i < getNumOutputChannels(); ++i)
-		buffer.clear (i, 0, buffer.getNumSamples());
+	synth.renderNextBlock(buffer, midiMessages, 0, numSamples);
 }
 
-//==============================================================================
+
 bool JuceBoxAudioProcessor::hasEditor() const
 {
     return true; // (change this to false if you choose to not supply an editor)
@@ -186,8 +204,48 @@ void JuceBoxAudioProcessor::setStateInformation (const void* data, int sizeInByt
 			String sampleFilePath = xmlState->getStringAttribute("sampleFile");
 			Logger::writeToLog("- sampleFile = " + sampleFilePath);
 			sampleFile = sampleFilePath;
+			loadSound();
 			}
 		}
+}
+
+
+void JuceBoxAudioProcessor::loadSound()
+{
+	Logger::writeToLog("- loadSound().");
+	synth.clearSounds();
+
+	if (!sampleFile.existsAsFile()) {
+		Logger::writeToLog("\"" + sampleFile.getFullPathName() + "\" doesn't exist.");
+		return;
+		}
+	AudioFormatReader* reader = formatManager.createReaderFor(sampleFile);
+	if (reader == NULL) {
+		Logger::writeToLog("No reader for \"" + sampleFile.getFullPathName() + "\".");
+		return;
+		}
+	Logger::writeToLog("Format: " + reader->getFormatName());
+	Logger::writeToLog("Sample rate: " + String(reader->sampleRate));
+	Logger::writeToLog("length: " + String(reader->lengthInSamples));
+	Logger::writeToLog("numChannels: " + String(reader->numChannels));
+	BigInteger notes;
+	notes.setRange(0, 127, true);
+	SamplerSound* sound =
+		new SamplerSound(
+			sampleFile.getFileNameWithoutExtension(),
+			*reader,
+			notes,
+			72 /* C5 == middle C above A-440 */,
+			0.0, 0.0,
+			20.0 /* max time, hopefully 20s is enough for any sound */);
+	synth.addSound(sound);
+	delete reader;
+}
+
+
+String JuceBoxAudioProcessor::formatWildcards()
+{
+	return formatManager.getWildcardForAllFormats();
 }
 
 
