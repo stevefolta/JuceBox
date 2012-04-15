@@ -7,7 +7,7 @@
               pluginIsSynth="1" pluginWantsMidiIn="1" pluginProducesMidiOut="0"
               pluginSilenceInIsSilenceOut="0" pluginTailLength="0" pluginEditorRequiresKeys="0"
               pluginAUExportPrefix="JuceBoxAU" pluginAUViewClass="JuceBoxAU_V1"
-              pluginRTASCategory="" jucerVersion="3.0.0">
+              pluginRTASCategory="" jucerVersion="3.0.0" defines="JUCE_USE_OGGVORBIS=1 JUCE_USE_MP3AUDIOFORMAT=1 JUCE_USE_FLAC=1">
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" objCExtraSuffix="Gg4aba" juceFolder="/Users/steve/local/src/juce/modules">
       <CONFIGURATIONS>
