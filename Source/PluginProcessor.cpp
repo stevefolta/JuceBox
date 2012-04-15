@@ -259,19 +259,8 @@ String JuceBoxAudioProcessor::infoString()
 	if (sound == NULL)
 		return "";
 	return
-		String(sound->lastNote) + (sound->lastNoteOn ? " on" : " off") +
 		" proc: " +
-		String(blocksStarted) + "/" + String(blocksFinished) +
-		" midi: " + String(synth.midiEvents) +
-		" notes: " +
-		String(synth.notesOn) + "/" + String(synth.notesOff) +
-		" synth: " +
-		String(synth.blocksStarted) + "/" + String(synth.blocksFinished) +
-		" notes: " +
-		String(sound->notesApplied) + "/" + String(sound->notesAccepted) +
-		" snd: " +
-		String((int64) sound->blocksStarted) + "/" +
-		String((int64) sound->blocksFinished);
+		String(blocksStarted) + "/" + String(blocksFinished);
 }
 
 

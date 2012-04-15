@@ -70,9 +70,6 @@ Synthesiser::Synthesiser()
 {
     for (int i = 0; i < numElementsInArray (lastPitchWheelValues); ++i)
         lastPitchWheelValues[i] = 0x2000;
-blocksStarted = blocksFinished = 0;
-notesOn = notesOff = 0;
-midiEvents = 0;
 }
 
 Synthesiser::~Synthesiser()
@@ -148,7 +145,6 @@ void Synthesiser::renderNextBlock (AudioSampleBuffer& outputBuffer,
                                    int startSample,
                                    int numSamples)
 {
-blocksStarted += 1;
     // must set the sample rate before using this!
     jassert (sampleRate != 0);
 
@@ -163,7 +159,6 @@ blocksStarted += 1;
         int midiEventPos;
         const bool useEvent = midiIterator.getNextEvent (m, midiEventPos)
                                 && midiEventPos < startSample + numSamples;
-if (useEvent) midiEvents += 1;
 
         const int numThisTime = useEvent ? midiEventPos - startSample
                                          : numSamples;
@@ -180,7 +175,6 @@ if (useEvent) midiEvents += 1;
         startSample += numThisTime;
         numSamples -= numThisTime;
     }
-blocksFinished += 1;
 }
 
 void Synthesiser::handleMidiEvent (const MidiMessage& m)
@@ -223,7 +217,6 @@ void Synthesiser::noteOn (const int midiChannel,
                           const float velocity)
 {
     const ScopedLock sl (lock);
-notesOn += 1;
 
     for (int i = sounds.size(); --i >= 0;)
     {
@@ -285,7 +278,6 @@ void Synthesiser::noteOff (const int midiChannel,
                            const int midiNoteNumber,
                            const bool allowTailOff)
 {
-notesOff += 1;
     const ScopedLock sl (lock);
 
     for (int i = voices.size(); --i >= 0;)

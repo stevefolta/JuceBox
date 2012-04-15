@@ -91,10 +91,6 @@ void JuceBoxAudioProcessorEditor::buttonClicked(Button* clickedButton)
 
 void JuceBoxAudioProcessorEditor::timerCallback()
 {
-	JuceBoxAudioProcessor* processor = getProcessor();
-	if (processor == NULL)
-		return;
-	infoLabel.setText(processor->infoString(), false);
 }
 
 

@@ -55,10 +55,6 @@ SamplerSound::SamplerSound (const String& name_,
         attackSamples = roundToInt (attackTimeSecs * sourceSampleRate);
         releaseSamples = roundToInt (releaseTimeSecs * sourceSampleRate);
     }
-blocksStarted = blocksFinished = 0;
-lastNote = 0;
-lastNoteOn = false;
-notesApplied = notesAccepted = 0;
 }
 
 SamplerSound::~SamplerSound()
@@ -68,8 +64,6 @@ SamplerSound::~SamplerSound()
 //==============================================================================
 bool SamplerSound::appliesToNote (const int midiNoteNumber)
 {
-notesApplied += 1;
-if (midiNotes[midiNoteNumber]) notesAccepted += 1;
     return midiNotes [midiNoteNumber];
 }
 
@@ -109,9 +103,6 @@ void SamplerVoice::startNote (const int midiNoteNumber,
 
     if (sound != nullptr)
     {
-SamplerSound* writeableSound = dynamic_cast<SamplerSound*>(s);
-writeableSound->lastNote = midiNoteNumber;
-writeableSound->lastNoteOn = true;
         const double targetFreq = MidiMessage::getMidiNoteInHertz (midiNoteNumber);
         const double naturalFreq = MidiMessage::getMidiNoteInHertz (sound->midiRootNote);
 
@@ -171,12 +162,10 @@ void SamplerVoice::controllerMoved (const int /*controllerNumber*/,
 //==============================================================================
 void SamplerVoice::renderNextBlock (AudioSampleBuffer& outputBuffer, int startSample, int numSamples)
 {
-    // const SamplerSound* const playingSound = static_cast <SamplerSound*> (getCurrentlyPlayingSound().getObject());
-    SamplerSound* playingSound = static_cast <SamplerSound*> (getCurrentlyPlayingSound().getObject());
+    const SamplerSound* const playingSound = static_cast <SamplerSound*> (getCurrentlyPlayingSound().getObject());
 
     if (playingSound != nullptr)
     {
-playingSound->blocksStarted += 1;
         const float* const inL = playingSound->data->getSampleData (0, 0);
         const float* const inR = playingSound->data->getNumChannels() > 1
                                     ? playingSound->data->getSampleData (1, 0) : nullptr;
@@ -243,6 +232,5 @@ playingSound->blocksStarted += 1;
                 break;
             }
         }
-playingSound->blocksFinished += 1;
     }
 }
