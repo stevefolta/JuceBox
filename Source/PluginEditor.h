@@ -13,13 +13,12 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
+#include "ClickableLabel.h"
 
 
-//==============================================================================
-/**
-*/
 class JuceBoxAudioProcessorEditor :
-	public AudioProcessorEditor, public ButtonListener, public Timer
+	public AudioProcessorEditor, public Timer,
+	public ClickableLabel::ClickListener
 {
 public:
     JuceBoxAudioProcessorEditor (JuceBoxAudioProcessor* ownerFilter);
@@ -27,11 +26,11 @@ public:
 
     void	paint(Graphics& g);
 		void	resized();
-		void	buttonClicked(Button* button);
+		void	labelClicked(Label* clickedLabel);
 		void	timerCallback();
 
 protected:
-		TextButton	button;
+		ClickableLabel	fileLabel;
 		Label 	pathLabel;
 		Label 	infoLabel;
 		MidiKeyboardComponent	midiKeyboard;
@@ -39,6 +38,10 @@ protected:
 		JuceBoxAudioProcessor* getProcessor() const {
 			return static_cast<JuceBoxAudioProcessor*> (getAudioProcessor());
 			}
+
+		void	chooseFile();
+		void	setFile(File* newFile);
+		void	updateFile(File* file);
 };
 
 

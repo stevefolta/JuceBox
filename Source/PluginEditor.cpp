@@ -15,27 +15,31 @@
 //==============================================================================
 JuceBoxAudioProcessorEditor::JuceBoxAudioProcessorEditor (JuceBoxAudioProcessor* ownerFilter)
 	: AudioProcessorEditor(ownerFilter),
-	button("Load..."),
+	fileLabel(String::empty, "File..."),
 	pathLabel(String::empty),
 	midiKeyboard(ownerFilter->keyboardState, MidiKeyboardComponent::horizontalKeyboard)
 {
 	// This is where our plugin's editor size is set.
-	setSize (500, 300);
+	setSize(500, 300);
 
-	addAndMakeVisible(&button);
-	button.addListener(this);
+	addAndMakeVisible(&fileLabel);
+	fileLabel.setFont(Font(18.0, Font::bold));
+	fileLabel.setColour(Label::textColourId, Colours::grey);
+	fileLabel.addClickListener(this);
 
 	addAndMakeVisible(&pathLabel);
 	pathLabel.setFont(Font(14.0));
-	File sampleFile = ownerFilter->getSampleFile();
-	pathLabel.setText(sampleFile.getFullPathName(), false);
 
 	addAndMakeVisible(&infoLabel);
 	infoLabel.setFont(Font(14.0));
 
 	addAndMakeVisible(&midiKeyboard);
 
-	startTimer(50);
+	startTimer(200);
+
+	File sampleFile = ownerFilter->getSampleFile();
+	if (sampleFile != File::nonexistent)
+		updateFile(&sampleFile);
 }
 
 
@@ -46,21 +50,23 @@ JuceBoxAudioProcessorEditor::~JuceBoxAudioProcessorEditor()
 
 void JuceBoxAudioProcessorEditor::paint (Graphics& g)
 {
-    g.fillAll(Colours::white);
+	g.fillAll(Colours::white);
 }
 
 
 void JuceBoxAudioProcessorEditor::resized()
 {
+Logger::writeToLog("- resized().");
 	enum {
 		hMargin = 10,
-		vMargin = 4,
+		vMargin = 10,
 		buttonHeight = 25,
 		labelHeight = 25,
 		keyboardHeight = 70,
 		};
-	button.setBounds(hMargin, vMargin, 150, buttonHeight);
 	int marginedWidth = getWidth() - 2 * hMargin;
+	fileLabel.setBounds(
+		hMargin, vMargin, marginedWidth, labelHeight);
 	pathLabel.setBounds(
 		hMargin, vMargin + buttonHeight, marginedWidth, labelHeight);
 	infoLabel.setBounds(
@@ -72,25 +78,50 @@ void JuceBoxAudioProcessorEditor::resized()
 }
 
 
-void JuceBoxAudioProcessorEditor::buttonClicked(Button* clickedButton)
+void JuceBoxAudioProcessorEditor::labelClicked(Label* clickedLabel)
 {
-	if (clickedButton == &button) {
-		JuceBoxAudioProcessor* processor = getProcessor();
-		FileChooser chooser(
-			"Select a sample file...",
-			File::nonexistent,
-			processor->formatWildcards());
-		if (chooser.browseForFileToOpen()) {
-			File sampleFile(chooser.getResult());
-			processor->setSampleFile(&sampleFile);
-			pathLabel.setText(sampleFile.getFullPathName(), false);
-			}
-		}
+	if (clickedLabel == &fileLabel)
+		chooseFile();
 }
 
 
 void JuceBoxAudioProcessorEditor::timerCallback()
 {
+/***
+	String infoText =
+		"parent: " + String(getParentWidth()) + "x" + String(getParentHeight()) +
+		" self: " + String(getWidth()) + "x" + String(getHeight());
+	infoLabel.setText(infoText, false);
+***/
+}
+
+
+void JuceBoxAudioProcessorEditor::chooseFile()
+{
+	JuceBoxAudioProcessor* processor = getProcessor();
+	FileChooser chooser(
+		"Select a sample file...",
+		File::nonexistent,
+		processor->formatWildcards());
+	if (chooser.browseForFileToOpen()) {
+		File sampleFile(chooser.getResult());
+		setFile(&sampleFile);
+		}
+}
+
+
+void JuceBoxAudioProcessorEditor::setFile(File* newFile)
+{
+	getProcessor()->setSampleFile(newFile);
+	updateFile(newFile);
+}
+
+
+void JuceBoxAudioProcessorEditor::updateFile(File* file)
+{
+	fileLabel.setText(file->getFileName(), false);
+	fileLabel.setColour(Label::textColourId, Colours::black);
+	pathLabel.setText(file->getParentDirectory().getFullPathName(), false);
 }
 
 

@@ -20,6 +20,10 @@
   </EXPORTFORMATS>
   <MAINGROUP id="naVxX1" name="JuceBox">
     <GROUP id="{E32C6378-C318-1163-E71C-BEF0ADF2FE2E}" name="Source">
+      <FILE id="xvREOW" name="ClickableLabel.cpp" compile="1" resource="0"
+            file="Source/ClickableLabel.cpp"/>
+      <FILE id="hfN9Vg" name="ClickableLabel.h" compile="0" resource="0"
+            file="Source/ClickableLabel.h"/>
       <FILE id="ktcmxP" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="Wy0AL9" name="PluginProcessor.h" compile="0" resource="0"
